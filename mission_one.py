@@ -23,10 +23,12 @@ def mission_one(r: robot):
     r.robot.straight(700)
     r.robot.turn(60)
     r.robot.straight(200)
-    r.robot.straight(-75)
-    r.robot.turn(-150)
-    r.robot.straight(-200)
-
+    r.robot.straight(-95)
+    r.robot.turn(-140)
+    r.robot.straight(-110)
+    r.robot.turn(-20)
+    r.robot.straight(-120)
+    r.ram.run_time(-150,7000)
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.
