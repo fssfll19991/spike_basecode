@@ -1,8 +1,9 @@
 {
   "version": "0.2.0",
   "configurations": [
+
     {
-      "name": "Run on BR-01",
+      "name": "Run on BR-33",
       "type": "debugpy",
       "noDebug": true,
       "request": "launch",
@@ -11,7 +12,7 @@
         "run",
         "ble",
         "--name",
-        "BR-01",
+        "BR-33",
         "main.py"
       ]
     },
