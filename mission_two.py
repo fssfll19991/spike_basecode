@@ -30,7 +30,7 @@ def mission_two(r: robot):
     r.robot.straight(470)
     r.robot.turn(-150)
     r.robot.straight(160)
-    r.lam.run_time(-170,500)
+    r.lam.run_time(-170,480)
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.
