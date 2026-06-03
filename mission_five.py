@@ -19,7 +19,9 @@ from pybricks.tools import wait, StopWatch
 def mission_five(r: robot):
     print("Running Mission 5")
     # Your code goes here...
-
+    r.robot.straight(700)
+    #r.lam.run_time(170,700)
+    #r.robot.straight(200)
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.
