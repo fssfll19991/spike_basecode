@@ -128,6 +128,15 @@ async def main1():
                 average_angle = (left_delta + right_delta) / 2
                 distance = average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10
                 print("Distance driven: {0:.1f} cm".format(distance))
+            # Also print the raw motor angle for the function and
+            # switch motors, not converted to anything else, but only
+            # while their corresponding controller buttons are pressed.
+            pressed = controller.buttons.pressed()
+            if Button.RB in pressed or Button.LB in pressed:
+                print("Function angle: {0} deg".format(function.angle()))
+            if (Button.X in pressed or Button.A in pressed
+                    or Button.Y in pressed or Button.B in pressed):
+                print("Switch angle: {0} deg".format(switch.angle()))
         if busy_switching:
             # If we are currently busy switching the function, we stop
             # driving and powering the function motor to be safe.
