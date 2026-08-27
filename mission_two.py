@@ -22,7 +22,7 @@ def mission_two(r: robot):
     # Sample code: Test Driving in a box
     r.robot.straight(210)
     r.robot.turn(-50)
-    r.robot.straight(325)
+    r.robot.straight(375)
     r.robot.straight(-100)
     #r.robot.turn(70)
     #r.robot.straight(275)
