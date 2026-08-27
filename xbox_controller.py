@@ -15,6 +15,18 @@ controller = XboxController()
 # Wheel size, used to convert motor angle to distance driven.
 WHEEL_DIAMETER = 55.5  # mm
 
+# Names of the dpad directions, for debug printing.
+DIRECTION_NAMES = {
+    1: "Forward",
+    2: "Forward / Right",
+    3: "Right",
+    4: "Reverse / Right",
+    5: "Reverse",
+    6: "Reverse / Left",
+    7: "Left",
+    8: "Forward / Left",
+}
+
 # Initialize variables.
 left_end = 0
 right_end = 0
@@ -36,18 +48,19 @@ async def switch_function(number):
         await wait(1)
         # Go to the target angle. But give up if it takes more
         # than 2 seconds, which means it's stuck for now.
-        await multitask(switch.run_target(750, number * 90, Stop.COAST), wait(2000), race=True)
+        #await multitask(switch.run_target(750, number * 90, Stop.COAST), wait(2000), race=True)
         # Let's check if we're on target.
-        if abs(switch.angle() - number * 90) <= 10:
+        #if abs(switch.angle() - number * 90) <= 10:
+        if busy_switching == 1:
             # We are close to the target angle.
             # so we can exit this repeating loop.
             break
         # Otherwise, we're not done yet, so we must be stuck.
         # Let's wiggle the motor around to try to get it unstuck.
-        switch.track_target(0)
-        await wait(1000)
-        switch.track_target(270)
-        await wait(1000)
+        #switch.track_target(0)
+        #await wait(1000)
+        #switch.track_target(270)
+        #await wait(1000)
         switch.stop()
     # We're no longer busy switching, so we can drive again.
     busy_switching = 0
@@ -58,16 +71,30 @@ async def main1():
     left.control.limits(acceleration=2500)
     right.control.limits(acceleration=2500)
     print_counter = 0
+    active_direction = 0
+    left_start = left.angle()
+    right_start = right.angle()
     while True:
         await wait(1)
+        # The dpad direction selects which way we drive. Releasing the
+        # dpad (direction 0) does not reset the distance, so inching
+        # ahead in the same direction with several short presses still
+        # adds up. Only pressing an actual different direction resets it.
+        direction = controller.dpad()
+        if direction and direction != active_direction:
+            active_direction = direction
+            left_start = left.angle()
+            right_start = right.angle()
+            print("Direction: {0}".format(DIRECTION_NAMES[direction]))
         # Print the distance driven to the debug screen every 500 ms,
-        # based on the average angle turned by the two drive motors.
+        # based on the average angle turned by the two drive motors
+        # since the current direction was first selected.
         print_counter += 1
         if print_counter >= 500:
             print_counter = 0
-            average_angle = (left.angle() + right.angle()) / 2
-            distance = average_angle / 360 * math.pi * WHEEL_DIAMETER
-            print("Distance driven: {0:.1f} mm".format(distance))
+            average_angle = ((left.angle() - left_start) + (right.angle() - right_start)) / 2
+            distance = average_angle / 360 * math.pi * WHEEL_DIAMETER / 10
+            print("Distance driven: {0:.1f} cm".format(distance))
         if busy_switching:
             # If we are currently busy switching the function, we stop
             # driving and powering the function motor to be safe.
