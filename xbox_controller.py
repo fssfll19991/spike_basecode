@@ -1,3 +1,5 @@
+import math
+
 from pybricks.iodevices import XboxController
 from pybricks.parameters import Button, Direction, Port, Stop
 from pybricks.pupdevices import Motor
@@ -9,6 +11,9 @@ right = Motor(Port.F, Direction.CLOCKWISE)
 function = Motor(Port.C, Direction.CLOCKWISE)
 switch = Motor(Port.D, Direction.CLOCKWISE)
 controller = XboxController()
+
+# Wheel size, used to convert motor angle to distance driven.
+WHEEL_DIAMETER = 55.5  # mm
 
 # Initialize variables.
 left_end = 0
@@ -52,8 +57,17 @@ async def main1():
     # that powers (not switches) the function gearbox.
     left.control.limits(acceleration=2500)
     right.control.limits(acceleration=2500)
+    print_counter = 0
     while True:
         await wait(1)
+        # Print the distance driven to the debug screen every 500 ms,
+        # based on the average angle turned by the two drive motors.
+        print_counter += 1
+        if print_counter >= 500:
+            print_counter = 0
+            average_angle = (left.angle() + right.angle()) / 2
+            distance = average_angle / 360 * math.pi * WHEEL_DIAMETER
+            print("Distance driven: {0:.1f} mm".format(distance))
         if busy_switching:
             # If we are currently busy switching the function, we stop
             # driving and powering the function motor to be safe.
