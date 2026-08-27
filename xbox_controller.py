@@ -3,7 +3,16 @@ import umath
 from pybricks.iodevices import XboxController
 from pybricks.parameters import Button, Direction, Port, Stop
 from pybricks.pupdevices import Motor
+from pybricks.robotics import DriveBase
 from pybricks.tools import multitask, run_task, wait
+
+# Wheel size, used to convert motor angle to distance driven.
+WHEEL_DIAMETER = 55.5  # mm
+
+# Distance between the centers of the left and right wheels, used to
+# convert wheel angle to the angle the robot itself turned during a
+# pivot turn, and by the drive base for gyro-corrected driving.
+TRACK_WIDTH = 80  # mm
 
 # Set up all devices.
 left = Motor(Port.E, Direction.COUNTERCLOCKWISE)
@@ -12,13 +21,16 @@ function = Motor(Port.C, Direction.CLOCKWISE)
 switch = Motor(Port.D, Direction.CLOCKWISE)
 controller = XboxController()
 
-# Wheel size, used to convert motor angle to distance driven.
-WHEEL_DIAMETER = 55.5  # mm
+# Used for forward/reverse driving, so the gyro can keep us driving
+# straight. Left/right pivot turns and diagonal turns still drive the
+# left/right motors directly, which automatically cancels the drive
+# base's current maneuver.
+drivebase = DriveBase(left, right, WHEEL_DIAMETER, TRACK_WIDTH)
+drivebase.use_gyro(True)
 
-# Distance between the centers of the left and right wheels, used to
-# convert wheel angle to the angle the robot itself turned during a
-# pivot turn.
-TRACK_WIDTH = 80  # mm
+# Linear speed for forward/reverse that matches the previous 250 deg/s
+# wheel speed used for turning.
+DRIVE_SPEED = 250 / 360 * umath.pi * WHEEL_DIAMETER  # mm/s
 
 # Names of the dpad directions, for debug printing.
 DIRECTION_NAMES = {
@@ -80,11 +92,16 @@ async def main1():
     right_start = right.angle()
     while True:
         await wait(1)
+        # Only Forward (1), Right (3), Reverse (5), and Left (7) drive
+        # the robot. Any other dpad tap (the diagonals) is ignored
+        # entirely, as if the dpad were untouched.
+        direction = controller.dpad()
+        if direction not in (1, 3, 5, 7):
+            direction = 0
         # The dpad direction selects which way we drive. Releasing the
         # dpad (direction 0) does not reset the distance, so inching
         # ahead in the same direction with several short presses still
         # adds up. Only pressing an actual different direction resets it.
-        direction = controller.dpad()
         if direction and direction != active_direction:
             active_direction = direction
             left_start = left.angle()
@@ -114,8 +131,7 @@ async def main1():
         if busy_switching:
             # If we are currently busy switching the function, we stop
             # driving and powering the function motor to be safe.
-            left.stop()
-            right.stop()
+            drivebase.stop()
             function.stop()
         else:
             # Otherwise drive the motors based on the buttons that are pressed.
@@ -127,42 +143,25 @@ async def main1():
             else:
                 function.stop()
             # Use the direction pad for driving.
-            if controller.dpad() == 1:
-                # Forward
-                left.run(250)
-                right.run(250)
-            elif controller.dpad() == 2:
-                # Forward / Right
-                right.stop()
-                left.run(250)
-            elif controller.dpad() == 3:
+            if direction == 1:
+                # Forward. Use the drive base so the gyro keeps us
+                # driving straight.
+                drivebase.drive(DRIVE_SPEED, 0)
+            elif direction == 3:
                 # Right
-                left.run(250)
-                right.run(-250)
-            elif controller.dpad() == 4:
-                # Reverse / Right
-                right.run(-250)
-                left.stop()
-            elif controller.dpad() == 5:
-                # Reverse
-                left.run(-250)
-                right.run(-250)
-            elif controller.dpad() == 6:
-                # Reverse / Left
-                left.run(-250)
-                right.stop()
-            elif controller.dpad() == 7:
+                left.run(50)
+                right.run(-50)
+            elif direction == 5:
+                # Reverse. Use the drive base so the gyro keeps us
+                # driving straight.
+                drivebase.drive(-DRIVE_SPEED, 0)
+            elif direction == 7:
                 # Left
-                left.run(-250)
-                right.run(250)
-            elif controller.dpad() == 8:
-                # Forward / Left
-                right.run(250)
-                left.stop()
+                left.run(-50)
+                right.run(50)
             else:
-                # Nothing, so stop.
-                left.stop()
-                right.stop()
+                # Nothing (or an ignored diagonal tap), so stop.
+                drivebase.stop()
 
 async def main2():
     global right_end, left_end
