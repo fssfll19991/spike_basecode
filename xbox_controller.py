@@ -1,4 +1,4 @@
-import math
+import umath
 
 from pybricks.iodevices import XboxController
 from pybricks.parameters import Button, Direction, Port, Stop
@@ -14,6 +14,11 @@ controller = XboxController()
 
 # Wheel size, used to convert motor angle to distance driven.
 WHEEL_DIAMETER = 55.5  # mm
+
+# Distance between the centers of the left and right wheels, used to
+# convert wheel angle to the angle the robot itself turned during a
+# pivot turn.
+TRACK_WIDTH = 80  # mm
 
 # Names of the dpad directions, for debug printing.
 DIRECTION_NAMES = {
@@ -48,19 +53,18 @@ async def switch_function(number):
         await wait(1)
         # Go to the target angle. But give up if it takes more
         # than 2 seconds, which means it's stuck for now.
-        #await multitask(switch.run_target(750, number * 90, Stop.COAST), wait(2000), race=True)
+        await multitask(switch.run_target(750, number * 90, Stop.COAST), wait(2000), race=True)
         # Let's check if we're on target.
-        #if abs(switch.angle() - number * 90) <= 10:
-        if busy_switching == 1:
+        if abs(switch.angle() - number * 90) <= 10:
             # We are close to the target angle.
             # so we can exit this repeating loop.
             break
         # Otherwise, we're not done yet, so we must be stuck.
         # Let's wiggle the motor around to try to get it unstuck.
-        #switch.track_target(0)
-        #await wait(1000)
-        #switch.track_target(270)
-        #await wait(1000)
+        switch.track_target(0)
+        await wait(1000)
+        switch.track_target(270)
+        await wait(1000)
         switch.stop()
     # We're no longer busy switching, so we can drive again.
     busy_switching = 0
@@ -86,15 +90,27 @@ async def main1():
             left_start = left.angle()
             right_start = right.angle()
             print("Direction: {0}".format(DIRECTION_NAMES[direction]))
-        # Print the distance driven to the debug screen every 500 ms,
-        # based on the average angle turned by the two drive motors
-        # since the current direction was first selected.
+        # Print to the debug screen every 500 ms, measured since the
+        # current direction was first selected. For Left/Right (pivot
+        # turns), print the angle the robot turned. Otherwise, print
+        # the distance driven.
         print_counter += 1
         if print_counter >= 500:
             print_counter = 0
-            average_angle = ((left.angle() - left_start) + (right.angle() - right_start)) / 2
-            distance = average_angle / 360 * math.pi * WHEEL_DIAMETER / 10
-            print("Distance driven: {0:.1f} cm".format(distance))
+            left_delta = left.angle() - left_start
+            right_delta = right.angle() - right_start
+            if active_direction in (3, 7):
+                wheel_angle = abs(left_delta - right_delta) / 2
+                # During a pivot turn, each wheel traces an arc around
+                # the robot's center, which is TRACK_WIDTH / 2 away.
+                # Scale the wheel's own rotation by the ratio of wheel
+                # diameter to track width to get the robot's rotation.
+                angle_turned = wheel_angle * WHEEL_DIAMETER / TRACK_WIDTH
+                print("Angle turned: {0:.1f} deg".format(angle_turned))
+            else:
+                average_angle = (left_delta + right_delta) / 2
+                distance = average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10
+                print("Distance driven: {0:.1f} cm".format(distance))
         if busy_switching:
             # If we are currently busy switching the function, we stop
             # driving and powering the function motor to be safe.
@@ -113,35 +129,35 @@ async def main1():
             # Use the direction pad for driving.
             if controller.dpad() == 1:
                 # Forward
-                left.run(1000)
-                right.run(1000)
+                left.run(250)
+                right.run(250)
             elif controller.dpad() == 2:
                 # Forward / Right
                 right.stop()
-                left.run(1000)
+                left.run(250)
             elif controller.dpad() == 3:
                 # Right
-                left.run(1000)
-                right.run(-1000)
+                left.run(250)
+                right.run(-250)
             elif controller.dpad() == 4:
                 # Reverse / Right
-                right.run(-1000)
+                right.run(-250)
                 left.stop()
             elif controller.dpad() == 5:
                 # Reverse
-                left.run(-1000)
-                right.run(-1000)
+                left.run(-250)
+                right.run(-250)
             elif controller.dpad() == 6:
                 # Reverse / Left
-                left.run(-1000)
+                left.run(-250)
                 right.stop()
             elif controller.dpad() == 7:
                 # Left
-                left.run(-1000)
-                right.run(1000)
+                left.run(-250)
+                right.run(250)
             elif controller.dpad() == 8:
                 # Forward / Left
-                right.run(1000)
+                right.run(250)
                 left.stop()
             else:
                 # Nothing, so stop.
