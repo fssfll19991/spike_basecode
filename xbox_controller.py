@@ -154,16 +154,28 @@ async def attachment_stepper(motor, label, positive_button, negative_button):
         pressed = controller.buttons.pressed()
         if positive_button in pressed:
             target += 5
-            await motor.run_target(150, target, Stop.HOLD, wait=True)
+            await step_to_target(motor, target)
             print("{0} angle: {1} deg".format(label, motor.angle()))
             await wait(100)
         elif negative_button in pressed:
             target -= 5
-            await motor.run_target(150, target, Stop.HOLD, wait=True)
+            await step_to_target(motor, target)
             print("{0} angle: {1} deg".format(label, motor.angle()))
             await wait(100)
         else:
             await wait(1)
+
+async def step_to_target(motor, target):
+    # run_target()'s wait=True returns once the planned trajectory
+    # time elapses, but under Stop.HOLD the motor keeps actively
+    # correcting afterward. Rather than guess how long that takes,
+    # actively wait (up to 500 ms) until it has actually arrived,
+    # so the angle we print/act on next is the real, settled value.
+    await motor.run_target(150, target, Stop.HOLD, wait=True)
+    for _ in range(50):
+        if abs(motor.angle() - target) <= 1:
+            return
+        await wait(10)
 
 async def main():
     await multitask(
