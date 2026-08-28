@@ -1,10 +1,10 @@
 import umath
 
 from pybricks.iodevices import XboxController
-from pybricks.parameters import Button, Direction, Port, Stop
+from pybricks.parameters import Button, Direction, Port
 from pybricks.pupdevices import Motor
 from pybricks.robotics import DriveBase
-from pybricks.tools import multitask, run_task, wait
+from pybricks.tools import run_task, wait
 
 # Wheel size, used to convert motor angle to distance driven.
 WHEEL_DIAMETER = 55.5  # mm
@@ -55,11 +55,6 @@ SWITCH_TARGETS = {
     Button.Y: 180,
     Button.B: 270,
 }
-
-# Initialize variables.
-left_end = 0
-right_end = 0
-switch_calibrated = False
 
 async def main1():
     # This main task will handle driving and the motors that power
@@ -127,20 +122,17 @@ async def main1():
             function.stop()
         # Use X/A/Y/B for the switch motor, the same way as the
         # bumpers: drive at fixed power, toward that button's target
-        # angle, while held, and stop immediately on release. Only
-        # once main2() has finished calibrating it, so we don't issue
-        # conflicting commands to the same motor during calibration.
-        if switch_calibrated:
-            switch_button = None
-            for button in SWITCH_TARGETS:
-                if button in pressed:
-                    switch_button = button
-                    break
-            if switch_button is not None:
-                target = SWITCH_TARGETS[switch_button]
-                switch.dc(100 if target > switch.angle() else -100)
-            else:
-                switch.stop()
+        # angle, while held, and stop immediately on release.
+        switch_button = None
+        for button in SWITCH_TARGETS:
+            if button in pressed:
+                switch_button = button
+                break
+        if switch_button is not None:
+            target = SWITCH_TARGETS[switch_button]
+            switch.dc(100 if target > switch.angle() else -100)
+        else:
+            switch.stop()
         # Use the direction pad for driving.
         if direction == 1:
             # Forward. Use the drive base so the gyro keeps us
@@ -162,20 +154,7 @@ async def main1():
             # Nothing (or an ignored diagonal tap), so stop.
             drivebase.stop()
 
-async def main2():
-    global right_end, left_end, switch_calibrated
-    # This task calibrates the switch (function-select) gearbox by
-    # finding its start and end stops. After that, X/A/Y/B in main1()
-    # take over.
-    await switch.run_until_stalled(500, Stop.COAST, 50)
-    right_end = switch.angle()
-    await switch.run_until_stalled(-500, Stop.COAST, 50)
-    left_end = switch.angle()
-    switch.reset_angle((left_end + 270 - right_end) / 2)
-    switch_calibrated = True
-
-
 async def main():
-    await multitask(main1(), main2())
+    await main1()
 
 run_task(main())
