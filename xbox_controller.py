@@ -17,8 +17,8 @@ TRACK_WIDTH = 80  # mm
 # Set up all devices.
 left = Motor(Port.E, Direction.COUNTERCLOCKWISE)
 right = Motor(Port.F, Direction.CLOCKWISE)
-function = Motor(Port.C, Direction.CLOCKWISE)
-switch = Motor(Port.D, Direction.CLOCKWISE)
+left_attachement = Motor(Port.C, Direction.CLOCKWISE)
+right_attachement = Motor(Port.D, Direction.CLOCKWISE)
 controller = XboxController()
 
 # Used for forward/reverse driving, so the gyro can keep us driving
@@ -46,13 +46,14 @@ DIRECTION_NAMES = {
 
 async def main1():
     # This main task will handle driving and the motors that power
-    # the function and switch mechanisms.
+    # the left and right attachements.
     left.control.limits(acceleration=2500)
     right.control.limits(acceleration=2500)
     print_counter = 0
     active_direction = 0
     left_start = left.angle()
     right_start = right.angle()
+    last_drive_value = None
     while True:
         await wait(1)
         pressed = controller.buttons.pressed()
@@ -78,45 +79,56 @@ async def main1():
         print_counter += 1
         if print_counter >= 500:
             print_counter = 0
-            left_delta = left.angle() - left_start
-            right_delta = right.angle() - right_start
-            if active_direction in (3, 7):
-                wheel_angle = abs(left_delta - right_delta) / 2
-                # During a pivot turn, each wheel traces an arc around
-                # the robot's center, which is TRACK_WIDTH / 2 away.
-                # Scale the wheel's own rotation by the ratio of wheel
-                # diameter to track width to get the robot's rotation.
-                angle_turned = wheel_angle * WHEEL_DIAMETER / TRACK_WIDTH
-                print("Angle turned: {0:.1f} deg".format(angle_turned))
-            else:
-                average_angle = (left_delta + right_delta) / 2
-                distance = average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10
-                print("Distance driven: {0:.1f} cm".format(distance))
-            # Also print the raw motor angle for the function and
-            # switch motors, not converted to anything else, but only
+            # Don't print distance/angle while the left or right
+            # attachement is being operated, and don't print it again
+            # if it hasn't changed since the last time.
+            using_other_motor = (Button.RB in pressed or Button.LB in pressed
+                                  or Button.X in pressed or Button.B in pressed)
+            if not using_other_motor:
+                left_delta = left.angle() - left_start
+                right_delta = right.angle() - right_start
+                if active_direction in (3, 7):
+                    wheel_angle = abs(left_delta - right_delta) / 2
+                    # During a pivot turn, each wheel traces an arc
+                    # around the robot's center, which is
+                    # TRACK_WIDTH / 2 away. Scale the wheel's own
+                    # rotation by the ratio of wheel diameter to track
+                    # width to get the robot's rotation.
+                    drive_value = round(wheel_angle * WHEEL_DIAMETER / TRACK_WIDTH, 1)
+                    if drive_value != last_drive_value:
+                        last_drive_value = drive_value
+                        print("Angle turned: {0:.1f} deg".format(drive_value))
+                else:
+                    average_angle = (left_delta + right_delta) / 2
+                    drive_value = round(average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10, 1)
+                    if drive_value != last_drive_value:
+                        last_drive_value = drive_value
+                        print("Distance driven: {0:.1f} cm".format(drive_value))
+            # Also print the raw motor angle for the left and right
+            # attachements, not converted to anything else, but only
             # while their corresponding controller buttons are pressed.
             if Button.RB in pressed or Button.LB in pressed:
-                print("Function angle: {0} deg".format(function.angle()))
+                print("Left attachement angle: {0} deg".format(left_attachement.angle()))
             if Button.X in pressed or Button.B in pressed:
-                print("Switch angle: {0} deg".format(switch.angle()))
-        # Use the bumpers for the function motor: drive at fixed power
-        # while held, stop immediately on release.
+                print("Right attachement angle: {0} deg".format(right_attachement.angle()))
+        # Use the bumpers for the left attachement: drive at fixed
+        # power while held, stop immediately on release.
         if Button.RB in pressed:
-            function.dc(100)
+            left_attachement.dc(25)
         elif Button.LB in pressed:
-            function.dc(-100)
+            left_attachement.dc(-25)
         else:
-            function.stop()
-        # Use X and B for the switch motor, the same way as the
+            left_attachement.stop()
+        # Use X and B for the right attachement, the same way as the
         # bumpers: drive at fixed power while held, stop immediately
         # on release. X spins clockwise, B spins counterclockwise.
         # A and Y are ignored.
         if Button.X in pressed:
-            switch.dc(100)
+            right_attachement.dc(25)
         elif Button.B in pressed:
-            switch.dc(-100)
+            right_attachement.dc(-25)
         else:
-            switch.stop()
+            right_attachement.stop()
         # Use the direction pad for driving.
         if direction == 1:
             # Forward. Use the drive base so the gyro keeps us
