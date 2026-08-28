@@ -127,9 +127,9 @@ async def main1():
         # Use the bumpers for the left attachement: drive at fixed
         # power while held, stop immediately on release.
         if Button.RB in pressed:
-            left_attachement.dc(10)
+            left_attachement.dc(15)
         elif Button.LB in pressed:
-            left_attachement.dc(-10)
+            left_attachement.dc(-15)
         else:
             left_attachement.stop()
         # Use X and B for the right attachement, the same way as the
@@ -137,9 +137,9 @@ async def main1():
         # on release. X spins clockwise, B spins counterclockwise.
         # A and Y are ignored.
         if Button.X in pressed:
-            right_attachement.dc(10)
+            right_attachement.dc(15)
         elif Button.B in pressed:
-            right_attachement.dc(-10)
+            right_attachement.dc(-15)
         else:
             right_attachement.stop()
         # Use the direction pad for driving.
