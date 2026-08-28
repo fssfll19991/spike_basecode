@@ -141,19 +141,25 @@ async def main1():
 async def attachment_stepper(motor, label, positive_button, negative_button):
     # While the button is held, step the motor 5 degrees, pause
     # 100 ms, and repeat until it's released. A quick tap results in
-    # a single 5 degree step. 150 deg/s is slow enough that the motor
-    # can actually reach and settle at the target within just 5
-    # degrees, rather than the move being cut short.
+    # a single 5 degree step.
+    #
+    # We track the intended position ourselves and always command an
+    # absolute run_target(), rather than a relative run_angle() from
+    # wherever the motor actually ended up. That way, if a step
+    # under- or overshoots (e.g. from friction in the mechanism), the
+    # next tap corrects back to the exact intended multiple of 5
+    # instead of compounding the error onto every step after it.
+    target = motor.angle()
     while True:
         pressed = controller.buttons.pressed()
         if positive_button in pressed:
-            await motor.run_angle(150, 5, Stop.HOLD, wait=True)
-            await wait(20)  # Let Stop.HOLD settle before reading the angle.
+            target += 5
+            await motor.run_target(150, target, Stop.HOLD, wait=True)
             print("{0} angle: {1} deg".format(label, motor.angle()))
             await wait(100)
         elif negative_button in pressed:
-            await motor.run_angle(150, -5, Stop.HOLD, wait=True)
-            await wait(20)  # Let Stop.HOLD settle before reading the angle.
+            target -= 5
+            await motor.run_target(150, target, Stop.HOLD, wait=True)
             print("{0} angle: {1} deg".format(label, motor.angle()))
             await wait(100)
         else:
