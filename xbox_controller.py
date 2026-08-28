@@ -44,18 +44,6 @@ DIRECTION_NAMES = {
     8: "Forward / Left",
 }
 
-# Targets for the switch (function-select) motor, in degrees:
-# 0: Blade up/down.
-# 90: Ripper.
-# 180: Ladder.
-# 270: Blade tilt.
-SWITCH_TARGETS = {
-    Button.X: 0,
-    Button.A: 90,
-    Button.Y: 180,
-    Button.B: 270,
-}
-
 async def main1():
     # This main task will handle driving and the motors that power
     # the function and switch mechanisms.
@@ -109,8 +97,7 @@ async def main1():
             # while their corresponding controller buttons are pressed.
             if Button.RB in pressed or Button.LB in pressed:
                 print("Function angle: {0} deg".format(function.angle()))
-            if (Button.X in pressed or Button.A in pressed
-                    or Button.Y in pressed or Button.B in pressed):
+            if Button.X in pressed or Button.B in pressed:
                 print("Switch angle: {0} deg".format(switch.angle()))
         # Use the bumpers for the function motor: drive at fixed power
         # while held, stop immediately on release.
@@ -120,17 +107,14 @@ async def main1():
             function.dc(-100)
         else:
             function.stop()
-        # Use X/A/Y/B for the switch motor, the same way as the
-        # bumpers: drive at fixed power, toward that button's target
-        # angle, while held, and stop immediately on release.
-        switch_button = None
-        for button in SWITCH_TARGETS:
-            if button in pressed:
-                switch_button = button
-                break
-        if switch_button is not None:
-            target = SWITCH_TARGETS[switch_button]
-            switch.dc(100 if target > switch.angle() else -100)
+        # Use X and B for the switch motor, the same way as the
+        # bumpers: drive at fixed power while held, stop immediately
+        # on release. X spins clockwise, B spins counterclockwise.
+        # A and Y are ignored.
+        if Button.X in pressed:
+            switch.dc(100)
+        elif Button.B in pressed:
+            switch.dc(-100)
         else:
             switch.stop()
         # Use the direction pad for driving.
