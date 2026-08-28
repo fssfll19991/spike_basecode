@@ -54,9 +54,22 @@ async def main1():
     left_start = left.angle()
     right_start = right.angle()
     last_drive_value = None
+    left_attachement_active = False
+    right_attachement_active = False
     while True:
         await wait(1)
         pressed = controller.buttons.pressed()
+        # A quick tap of RB/LB or X/B can come and go between 500 ms
+        # print checks, so print the moment the button goes down,
+        # rather than only while it's still held at the next check.
+        left_attachement_pressed = Button.RB in pressed or Button.LB in pressed
+        if left_attachement_pressed and not left_attachement_active:
+            print("Left attachement angle: {0} deg".format(left_attachement.angle()))
+        left_attachement_active = left_attachement_pressed
+        right_attachement_pressed = Button.X in pressed or Button.B in pressed
+        if right_attachement_pressed and not right_attachement_active:
+            print("Right attachement angle: {0} deg".format(right_attachement.angle()))
+        right_attachement_active = right_attachement_pressed
         # Only Forward (1), Right (3), Reverse (5), and Left (7) drive
         # the robot. Any other dpad tap (the diagonals) is ignored
         # entirely, as if the dpad were untouched.
