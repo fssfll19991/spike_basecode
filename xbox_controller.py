@@ -21,6 +21,12 @@ left_attachement = Motor(Port.C, Direction.CLOCKWISE)
 right_attachement = Motor(Port.D, Direction.CLOCKWISE)
 controller = XboxController()
 
+# Treat wherever the attachements happen to be at startup as 0, so
+# their angle is relative to the start of the program rather than
+# whatever the motor's absolute encoder reads.
+left_attachement.reset_angle(0)
+right_attachement.reset_angle(0)
+
 # Used for forward/reverse driving, so the gyro can keep us driving
 # straight. Left/right pivot turns and diagonal turns still drive the
 # left/right motors directly, which automatically cancels the drive
