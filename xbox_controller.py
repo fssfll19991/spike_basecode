@@ -27,6 +27,13 @@ controller = XboxController()
 left_attachement.reset_angle(0)
 right_attachement.reset_angle(0)
 
+# A moderate acceleration limit gives each 5 degree step a well-formed
+# motion profile to follow, instead of an unrealistically short,
+# snap-like move that finishes (by the planner's clock) before the
+# motor has physically caught up.
+left_attachement.control.limits(acceleration=1000)
+right_attachement.control.limits(acceleration=1000)
+
 # Used for forward/reverse driving, so the gyro can keep us driving
 # straight. Left/right pivot turns and diagonal turns still drive the
 # left/right motors directly, which automatically cancels the drive
@@ -134,15 +141,19 @@ async def main1():
 async def attachment_stepper(motor, label, positive_button, negative_button):
     # While the button is held, step the motor 5 degrees, pause
     # 100 ms, and repeat until it's released. A quick tap results in
-    # a single 5 degree step.
+    # a single 5 degree step. 150 deg/s is slow enough that the motor
+    # can actually reach and settle at the target within just 5
+    # degrees, rather than the move being cut short.
     while True:
         pressed = controller.buttons.pressed()
         if positive_button in pressed:
-            await motor.run_angle(500, 5, Stop.HOLD, wait=True)
+            await motor.run_angle(150, 5, Stop.HOLD, wait=True)
+            await wait(20)  # Let Stop.HOLD settle before reading the angle.
             print("{0} angle: {1} deg".format(label, motor.angle()))
             await wait(100)
         elif negative_button in pressed:
-            await motor.run_angle(500, -5, Stop.HOLD, wait=True)
+            await motor.run_angle(150, -5, Stop.HOLD, wait=True)
+            await wait(20)  # Let Stop.HOLD settle before reading the angle.
             print("{0} angle: {1} deg".format(label, motor.angle()))
             await wait(100)
         else:
