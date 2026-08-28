@@ -1,10 +1,10 @@
 import umath
 
 from pybricks.iodevices import XboxController
-from pybricks.parameters import Button, Direction, Port
+from pybricks.parameters import Button, Direction, Port, Stop
 from pybricks.pupdevices import Motor
 from pybricks.robotics import DriveBase
-from pybricks.tools import run_task, wait
+from pybricks.tools import multitask, run_task, wait
 
 # Wheel size, used to convert motor angle to distance driven.
 WHEEL_DIAMETER = 55.5  # mm
@@ -54,22 +54,9 @@ async def main1():
     left_start = left.angle()
     right_start = right.angle()
     last_drive_value = None
-    left_attachement_active = False
-    right_attachement_active = False
     while True:
         await wait(1)
         pressed = controller.buttons.pressed()
-        # A quick tap of RB/LB or X/B can come and go between 500 ms
-        # print checks, so print the moment the button goes down,
-        # rather than only while it's still held at the next check.
-        left_attachement_pressed = Button.RB in pressed or Button.LB in pressed
-        if left_attachement_pressed and not left_attachement_active:
-            print("Left attachement angle: {0} deg".format(left_attachement.angle()))
-        left_attachement_active = left_attachement_pressed
-        right_attachement_pressed = Button.X in pressed or Button.B in pressed
-        if right_attachement_pressed and not right_attachement_active:
-            print("Right attachement angle: {0} deg".format(right_attachement.angle()))
-        right_attachement_active = right_attachement_pressed
         # Only Forward (1), Right (3), Reverse (5), and Left (7) drive
         # the robot. Any other dpad tap (the diagonals) is ignored
         # entirely, as if the dpad were untouched.
@@ -117,31 +104,6 @@ async def main1():
                     if drive_value != last_drive_value:
                         last_drive_value = drive_value
                         print("Distance driven: {0:.1f} cm".format(drive_value))
-            # Also print the raw motor angle for the left and right
-            # attachements, not converted to anything else, but only
-            # while their corresponding controller buttons are pressed.
-            if Button.RB in pressed or Button.LB in pressed:
-                print("Left attachement angle: {0} deg".format(left_attachement.angle()))
-            if Button.X in pressed or Button.B in pressed:
-                print("Right attachement angle: {0} deg".format(right_attachement.angle()))
-        # Use the bumpers for the left attachement: drive at fixed
-        # power while held, stop immediately on release.
-        if Button.RB in pressed:
-            left_attachement.dc(15)
-        elif Button.LB in pressed:
-            left_attachement.dc(-15)
-        else:
-            left_attachement.stop()
-        # Use X and B for the right attachement, the same way as the
-        # bumpers: drive at fixed power while held, stop immediately
-        # on release. X spins clockwise, B spins counterclockwise.
-        # A and Y are ignored.
-        if Button.X in pressed:
-            right_attachement.dc(15)
-        elif Button.B in pressed:
-            right_attachement.dc(-15)
-        else:
-            right_attachement.stop()
         # Use the direction pad for driving.
         if direction == 1:
             # Forward. Use the drive base so the gyro keeps us
@@ -163,7 +125,28 @@ async def main1():
             # Nothing (or an ignored diagonal tap), so stop.
             drivebase.stop()
 
+async def attachment_stepper(motor, label, positive_button, negative_button):
+    # While the button is held, step the motor 5 degrees, pause
+    # 100 ms, and repeat until it's released. A quick tap results in
+    # a single 5 degree step.
+    while True:
+        pressed = controller.buttons.pressed()
+        if positive_button in pressed:
+            await motor.run_angle(500, 5, Stop.HOLD, wait=True)
+            print("{0} angle: {1} deg".format(label, motor.angle()))
+            await wait(100)
+        elif negative_button in pressed:
+            await motor.run_angle(500, -5, Stop.HOLD, wait=True)
+            print("{0} angle: {1} deg".format(label, motor.angle()))
+            await wait(100)
+        else:
+            await wait(1)
+
 async def main():
-    await main1()
+    await multitask(
+        main1(),
+        attachment_stepper(left_attachement, "Left attachement", Button.RB, Button.LB),
+        attachment_stepper(right_attachement, "Right attachement", Button.X, Button.B),
+    )
 
 run_task(main())
