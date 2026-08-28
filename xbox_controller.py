@@ -27,12 +27,11 @@ controller = XboxController()
 left_attachement.reset_angle(0)
 right_attachement.reset_angle(0)
 
-# A moderate acceleration limit gives each 5 degree step a well-formed
-# motion profile to follow, instead of an unrealistically short,
-# snap-like move that finishes (by the planner's clock) before the
-# motor has physically caught up.
-left_attachement.control.limits(acceleration=1000)
-right_attachement.control.limits(acceleration=1000)
+# A high acceleration limit lets the controller apply torque quickly
+# for a step, instead of ramping up gently and possibly not
+# developing enough force to overcome friction within just 5 degrees.
+left_attachement.control.limits(acceleration=5000)
+right_attachement.control.limits(acceleration=5000)
 
 # Used for forward/reverse driving, so the gyro can keep us driving
 # straight. Left/right pivot turns and diagonal turns still drive the
@@ -171,7 +170,7 @@ async def step_to_target(motor, target):
     # correcting afterward. Rather than guess how long that takes,
     # actively wait (up to 500 ms) until it has actually arrived,
     # so the angle we print/act on next is the real, settled value.
-    await motor.run_target(150, target, Stop.HOLD, wait=True)
+    await motor.run_target(300, target, Stop.HOLD, wait=True)
     for _ in range(50):
         if abs(motor.angle() - target) <= 1:
             return
