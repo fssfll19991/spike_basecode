@@ -15,10 +15,10 @@ WHEEL_DIAMETER = 55.5  # mm
 TRACK_WIDTH = 80  # mm
 
 # Set up all devices.
-left = Motor(Port.E, Direction.COUNTERCLOCKWISE)
-right = Motor(Port.F, Direction.CLOCKWISE)
-left_attachement = Motor(Port.C, Direction.CLOCKWISE)
-right_attachement = Motor(Port.D, Direction.CLOCKWISE)
+left = Motor(Port.C, Direction.COUNTERCLOCKWISE)
+right = Motor(Port.D, Direction.CLOCKWISE)
+left_attachement = Motor(Port.F, Direction.CLOCKWISE)
+right_attachement = Motor(Port.E, Direction.CLOCKWISE)
 controller = XboxController()
 
 # Treat wherever the attachements happen to be at startup as 0, so
