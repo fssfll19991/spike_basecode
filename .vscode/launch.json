@@ -14,7 +14,8 @@
         "ble",
         "--name",
         "BR-33",
-        "main.py"
+        //"main.py"
+        "xbox_controller.py"
       ]
     },
     {
@@ -28,7 +29,8 @@
         "ble",
         "--name",
         "BR-99",
-        "xbox_controller.py"
+        //"xbox_controller.py"
+        "main.py"
       ]
     },
     {
@@ -42,11 +44,12 @@
         "ble",
         "--name",
         "BR-4",
-        "xbox_controller.py"
+        //"xbox_controller.py"
+        "main.py"
       ]
     },
     {
-      "name": "Run on BR-02",
+      "name": "Run on BR-5",
       "type": "debugpy",
       "noDebug": true,
       "request": "launch",
@@ -55,8 +58,9 @@
         "run",
         "ble",
         "--name",
-        "BR-02",
+        "BR-5",
         "main.py"
+        //"xbox_controller.py"
       ]
     },
     {
