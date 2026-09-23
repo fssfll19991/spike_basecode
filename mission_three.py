@@ -21,10 +21,11 @@ def mission_three(r: robot):
     print("Running Mission 3")
     # Your code goes here...
     # Sample Code: Test running the attachment motor until stalled
-    r.robot.straight(890)
-    r.robot.turn(-30)
-    r.robot.straight(70)
-    r.robot.turn(30)
+    r.robot.straight(1080)
+    r.robot.turn(-90)
+    r.robot.straight(97)
+    r.robot.turn(-90)
+
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.

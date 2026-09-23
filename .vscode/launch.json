@@ -14,8 +14,8 @@
         "ble",
         "--name",
         "BR-33",
-        //"main.py"
-        "xbox_controller.py"
+        "main.py"
+        //"xbox_controller.py"
       ]
     },
     {
@@ -29,6 +29,21 @@
         "ble",
         "--name",
         "BR-99",
+        //"xbox_controller.py"
+        "main.py"
+      ]
+    },
+    {
+      "name": "Run on 26BR2",
+      "type": "debugpy",
+      "noDebug": true,
+      "request": "launch",
+      "module": "pybricksdev",
+      "args": [
+        "run",
+        "ble",
+        "--name",
+        "26BR2",
         //"xbox_controller.py"
         "main.py"
       ]
