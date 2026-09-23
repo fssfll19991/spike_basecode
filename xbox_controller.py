@@ -56,6 +56,10 @@ DIRECTION_NAMES = {
     8: "Forward / Left",
 }
 
+# Movement recording storage
+movement_log = []
+recording_enabled = True  # Always recording
+
 async def main1():
     # This main task will handle driving and the motors that power
     # the left and right attachements.
@@ -66,9 +70,23 @@ async def main1():
     left_start = left.angle()
     right_start = right.angle()
     last_drive_value = None
+    playback_in_progress = False
     while True:
         await wait(1)
         pressed = controller.buttons.pressed()
+
+        # Check if Y button is pressed to start playback
+        if Button.Y in pressed and not playback_in_progress:
+            playback_in_progress = True
+            print("\n>>> Playback triggered! <<<")
+            await playback_movements()
+            playback_in_progress = False
+            # Reset tracking variables after playback
+            active_direction = 0
+            left_start = left.angle()
+            right_start = right.angle()
+            last_drive_value = None
+            continue
         # Only Forward (1), Right (3), Reverse (5), and Left (7) drive
         # the robot. Any other dpad tap (the diagonals) is ignored
         # entirely, as if the dpad were untouched.
@@ -84,6 +102,15 @@ async def main1():
             left_start = left.angle()
             right_start = right.angle()
             print("Direction: {0}".format(DIRECTION_NAMES[direction]))
+            # Record the direction change
+            if recording_enabled:
+                movement = {
+                    "type": "drive_start",
+                    "direction": direction,
+                    "direction_name": DIRECTION_NAMES[direction]
+                }
+                movement_log.append(movement)
+                print("[RECORDED] Drive: {0}".format(DIRECTION_NAMES[direction]))
         # Print to the debug screen every 500 ms, measured since the
         # current direction was first selected. For Left/Right (pivot
         # turns), print the angle the robot turned. Otherwise, print
@@ -110,12 +137,30 @@ async def main1():
                     if drive_value != last_drive_value:
                         last_drive_value = drive_value
                         print("Angle turned: {0:.1f} deg".format(drive_value))
+                        # Record the angle turned
+                        if recording_enabled:
+                            movement = {
+                                "type": "turn",
+                                "direction": active_direction,
+                                "angle_deg": drive_value
+                            }
+                            movement_log.append(movement)
+                            print("[RECORDED] Turn angle: {0:.1f} deg".format(drive_value))
                 else:
                     average_angle = (left_delta + right_delta) / 2
                     drive_value = round(average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10, 1)
                     if drive_value != last_drive_value:
                         last_drive_value = drive_value
                         print("Distance driven: {0:.1f} cm".format(drive_value))
+                        # Record the distance driven
+                        if recording_enabled:
+                            movement = {
+                                "type": "drive",
+                                "direction": active_direction,
+                                "distance_cm": drive_value
+                            }
+                            movement_log.append(movement)
+                            print("[RECORDED] Distance: {0:.1f} cm".format(drive_value))
         # Use the direction pad for driving.
         if direction == 1:
             # Forward. Use the drive base so the gyro keeps us
@@ -154,12 +199,36 @@ async def attachment_stepper(motor, label, positive_button, negative_button):
         if positive_button in pressed:
             target += 5
             await step_to_target(motor, target)
-            print("{0} angle: {1} deg".format(label, motor.angle()))
+            actual_angle = motor.angle()
+            print("{0} angle: {1} deg".format(label, actual_angle))
+            # Record the attachment movement
+            if recording_enabled:
+                movement = {
+                    "type": "attachment",
+                    "attachment": label,
+                    "button": str(positive_button),
+                    "angle_deg": actual_angle,
+                    "delta": +5
+                }
+                movement_log.append(movement)
+                print("[RECORDED] {0}: {1} deg (+5)".format(label, actual_angle))
             await wait(100)
         elif negative_button in pressed:
             target -= 5
             await step_to_target(motor, target)
-            print("{0} angle: {1} deg".format(label, motor.angle()))
+            actual_angle = motor.angle()
+            print("{0} angle: {1} deg".format(label, actual_angle))
+            # Record the attachment movement
+            if recording_enabled:
+                movement = {
+                    "type": "attachment",
+                    "attachment": label,
+                    "button": str(negative_button),
+                    "angle_deg": actual_angle,
+                    "delta": -5
+                }
+                movement_log.append(movement)
+                print("[RECORDED] {0}: {1} deg (-5)".format(label, actual_angle))
             await wait(100)
         else:
             await wait(1)
@@ -175,6 +244,132 @@ async def step_to_target(motor, target):
         if abs(motor.angle() - target) <= 1:
             return
         await wait(10)
+
+def print_movement_summary():
+    # Print a summary of all recorded movements
+    print("\n=== MOVEMENT LOG SUMMARY ===")
+    print("Total movements recorded: {0}".format(len(movement_log)))
+    if len(movement_log) > 0:
+        print("\nMovements:")
+        for i, move in enumerate(movement_log):
+            if move["type"] == "drive_start":
+                print("{0}: START - {1}".format(i+1, move["direction_name"]))
+            elif move["type"] == "drive":
+                print("{0}: DRIVE - {1} cm".format(i+1, move["distance_cm"]))
+            elif move["type"] == "turn":
+                print("{0}: TURN - {1} deg".format(i+1, move["angle_deg"]))
+            elif move["type"] == "attachment":
+                print("{0}: {1} - {2} deg ({3:+d})".format(
+                    i+1, move["attachment"], move["angle_deg"], move["delta"]))
+    print("=== END LOG ===\n")
+
+async def playback_movements():
+    # Playback all recorded movements
+    global recording_enabled
+
+    if len(movement_log) == 0:
+        print("No movements to playback!")
+        return
+
+    # Temporarily disable recording during playback
+    was_recording = recording_enabled
+    recording_enabled = False
+
+    print("\n=== STARTING PLAYBACK ===")
+    print("Playing back {0} movements...".format(len(movement_log)))
+
+    for i, move in enumerate(movement_log):
+        print("[PLAYBACK {0}/{1}] ".format(i+1, len(movement_log)), end="")
+
+        if move["type"] == "drive_start":
+            # Starting a new direction - just print it
+            print("Starting: {0}".format(move["direction_name"]))
+
+        elif move["type"] == "drive":
+            # Drive forward or reverse a certain distance
+            distance_cm = move["distance_cm"]
+            direction = move["direction"]
+            print("Driving {0} cm".format(distance_cm))
+
+            # Convert cm to motor degrees
+            distance_mm = distance_cm * 10
+            motor_degrees = distance_mm / (umath.pi * WHEEL_DIAMETER) * 360
+
+            # Reset motor starting positions
+            left_start = left.angle()
+            right_start = right.angle()
+
+            # Drive forward (1) or reverse (5)
+            if direction == 1:
+                drivebase.drive(DRIVE_SPEED, 0)
+            elif direction == 5:
+                drivebase.drive(-DRIVE_SPEED, 0)
+
+            # Wait until we've driven the target distance
+            while True:
+                left_delta = abs(left.angle() - left_start)
+                right_delta = abs(right.angle() - right_start)
+                average_delta = (left_delta + right_delta) / 2
+                if average_delta >= abs(motor_degrees):
+                    drivebase.stop()
+                    break
+                await wait(10)
+
+        elif move["type"] == "turn":
+            # Turn left or right a certain angle
+            angle_deg = move["angle_deg"]
+            direction = move["direction"]
+            print("Turning {0} deg".format(angle_deg))
+
+            # Convert robot turn angle to wheel angle
+            wheel_angle = angle_deg * TRACK_WIDTH / WHEEL_DIAMETER
+
+            # Reset motor starting positions
+            left_start = left.angle()
+            right_start = right.angle()
+
+            # Turn right (3) or left (7)
+            if direction == 3:
+                left.run(50)
+                right.run(-50)
+            elif direction == 7:
+                left.run(-50)
+                right.run(50)
+
+            # Wait until we've turned the target angle
+            while True:
+                left_delta = left.angle() - left_start
+                right_delta = right.angle() - right_start
+                turned_angle = abs(left_delta - right_delta) / 2
+                if turned_angle >= wheel_angle:
+                    left.stop()
+                    right.stop()
+                    break
+                await wait(10)
+
+        elif move["type"] == "attachment":
+            # Move an attachment to a specific angle
+            attachment_name = move["attachment"]
+            target_angle = move["angle_deg"]
+            print("{0} to {1} deg".format(attachment_name, target_angle))
+
+            # Determine which motor to use
+            if "Left" in attachment_name:
+                motor = left_attachement
+            else:
+                motor = right_attachement
+
+            # Move to the target angle
+            await motor.run_target(300, target_angle, Stop.HOLD, wait=True)
+            await wait(100)
+
+        # Small pause between movements
+        await wait(200)
+
+    print("=== PLAYBACK COMPLETE ===\n")
+
+    # Re-enable recording
+    recording_enabled = was_recording
 
 async def main():
     await multitask(

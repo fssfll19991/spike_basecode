@@ -34,6 +34,21 @@
       ]
     },
     {
+      "name": "Run on BR1",
+      "type": "debugpy",
+      "noDebug": true,
+      "request": "launch",
+      "module": "pybricksdev",
+      "args": [
+        "run",
+        "ble",
+        "--name",
+        "BR1",
+        "xbox_controller.py"
+        //"main.py"
+      ]
+    },
+    {
       "name": "Run on 26BR2",
       "type": "debugpy",
       "noDebug": true,
