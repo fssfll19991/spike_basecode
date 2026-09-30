@@ -19,13 +19,10 @@ from pybricks.tools import wait, StopWatch
 def mission_two(r: robot):
     print("Running Mission 2")
     # Your code goes here...
-    r.robot.straight(350)
-    r.robot.turn(90)
-    r.robot.straight(712)
-    #motor.run_for_degrees(port.A, -90, 100)
-    #r.ram.run_time(-270,5000)
-    r.lam.run_time(271,700)
-    r.lam.run_time(-100,750)
+    # Sample code: Test Driving in a box
+    r.robot.straight(210)
+    r.robot.turn(-50)
+    r.robot.straight(375)
     r.robot.straight(-100)
 
 

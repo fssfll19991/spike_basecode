@@ -43,6 +43,7 @@
         "main.py"
       ]
     },
+
     {
       "name": "Run on BR-33",
       "type": "debugpy",
@@ -55,10 +56,11 @@
         "--name",
         "BR-33",
         "main.py"
+        //"xbox_controller.py"
       ]
     },
     {
-      "name": "Run on BR-02",
+      "name": "Run on BR-99",
       "type": "debugpy",
       "noDebug": true,
       "request": "launch",
@@ -67,8 +69,69 @@
         "run",
         "ble",
         "--name",
-        "BR-02",
+        "BR-99",
+        //"xbox_controller.py"
         "main.py"
+      ]
+    },
+    {
+      "name": "Run on BR1",
+      "type": "debugpy",
+      "noDebug": true,
+      "request": "launch",
+      "module": "pybricksdev",
+      "args": [
+        "run",
+        "ble",
+        "--name",
+        "BR1",
+        "xbox_controller.py"
+        //"main.py"
+      ]
+    },
+    {
+      "name": "Run on 26BR2",
+      "type": "debugpy",
+      "noDebug": true,
+      "request": "launch",
+      "module": "pybricksdev",
+      "args": [
+        "run",
+        "ble",
+        "--name",
+        "26BR2",
+        //"xbox_controller.py"
+        "main.py"
+      ]
+    },
+    {
+      "name": "Run on BR-4",
+      "type": "debugpy",
+      "noDebug": true,
+      "request": "launch",
+      "module": "pybricksdev",
+      "args": [
+        "run",
+        "ble",
+        "--name",
+        "BR-4",
+        //"xbox_controller.py"
+        "main.py"
+      ]
+    },
+    {
+      "name": "Run on BR-5",
+      "type": "debugpy",
+      "noDebug": true,
+      "request": "launch",
+      "module": "pybricksdev",
+      "args": [
+        "run",
+        "ble",
+        "--name",
+        "BR-5",
+        "main.py"
+        //"xbox_controller.py"
       ]
     },
     {
