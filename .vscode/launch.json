@@ -59,8 +59,8 @@
         "ble",
         "--name",
         "26BR2",
-        //"xbox_controller.py"
-        "main.py"
+        "xbox_controller.py"
+        //"main.py"
       ]
     },
     {

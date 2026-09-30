@@ -25,6 +25,9 @@ def mission_three(r: robot):
     r.robot.turn(-90)
     r.robot.straight(97)
     r.robot.turn(-90)
+    r.lam.run_time(100, 1500)
+    r.robot.turn(-35)
+    r.lam.run_time(-100, 1500)
 
 ################################
 # KEEP THIS AT THE END OF THE FILE
