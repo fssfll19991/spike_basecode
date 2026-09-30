@@ -296,22 +296,43 @@ async def step_to_target(motor, target):
         await wait(10)
 
 def print_movement_summary():
-    # Print a summary of all recorded movements
-    print("\n=== MOVEMENT LOG SUMMARY ===")
+    # Print a detailed summary of all recorded movements
+    print("\n" + "="*50)
+    print("         RECORDED MISSION SUMMARY")
+    print("="*50)
     print("Total movements recorded: {0}".format(len(movement_log)))
-    if len(movement_log) > 0:
-        print("\nMovements:")
+
+    if len(movement_log) == 0:
+        print("\nNo movements recorded!")
+    else:
+        print("\n" + "-"*50)
+        print("Complete Mission Sequence:")
+        print("-"*50)
         for i, move in enumerate(movement_log):
             if move["type"] == "drive":
                 direction_name = DIRECTION_NAMES.get(move["direction"], "Unknown")
-                print("{0}: DRIVE {1} - {2:.1f} cm".format(i+1, direction_name, move["distance_cm"]))
+                print("\nStep {0}:".format(i+1))
+                print("  Type: DRIVE")
+                print("  Direction: {0}".format(direction_name))
+                print("  Distance: {0:.1f} cm".format(move["distance_cm"]))
+                print("  Raw data: {0}".format(move))
             elif move["type"] == "turn":
                 direction_name = DIRECTION_NAMES.get(move["direction"], "Unknown")
-                print("{0}: TURN {1} - {2:.1f} deg".format(i+1, direction_name, move["angle_deg"]))
+                print("\nStep {0}:".format(i+1))
+                print("  Type: TURN")
+                print("  Direction: {0}".format(direction_name))
+                print("  Angle: {0:.1f} degrees".format(move["angle_deg"]))
+                print("  Raw data: {0}".format(move))
             elif move["type"] == "attachment":
-                print("{0}: {1} - {2} deg ({3:+d})".format(
-                    i+1, move["attachment"], move["angle_deg"], move["delta"]))
-    print("=== END LOG ===\n")
+                print("\nStep {0}:".format(i+1))
+                print("  Type: ATTACHMENT")
+                print("  Motor: {0}".format(move["attachment"]))
+                print("  Target Angle: {0} degrees".format(move["angle_deg"]))
+                print("  Delta: {0:+d} degrees".format(move["delta"]))
+                print("  Button: {0}".format(move["button"]))
+                print("  Raw data: {0}".format(move))
+        print("\n" + "-"*50)
+    print("="*50 + "\n")
 
 async def playback_movements():
     # Playback all recorded movements
