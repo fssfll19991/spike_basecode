@@ -13,6 +13,7 @@
         "--name",
         "BR-4",
         "main.py"
+        //"xbox_controller.py"
       ]
     },
     {
@@ -26,7 +27,8 @@
         "ble",
         "--name",
         "26BR2",
-        "main.py"
+        //"main.py"
+        "xbox_controller.py"
       ]
     },
     {
@@ -41,6 +43,7 @@
         "--name",
         "BR-5",
         "main.py"
+        //"xbox_controller.py"
       ]
     },
 
@@ -90,51 +93,6 @@
       ]
     },
     {
-      "name": "Run on 26BR2",
-      "type": "debugpy",
-      "noDebug": true,
-      "request": "launch",
-      "module": "pybricksdev",
-      "args": [
-        "run",
-        "ble",
-        "--name",
-        "26BR2",
-        "xbox_controller.py"
-        //"main.py"
-      ]
-    },
-    {
-      "name": "Run on BR-4",
-      "type": "debugpy",
-      "noDebug": true,
-      "request": "launch",
-      "module": "pybricksdev",
-      "args": [
-        "run",
-        "ble",
-        "--name",
-        "BR-4",
-        //"xbox_controller.py"
-        "main.py"
-      ]
-    },
-    {
-      "name": "Run on BR-5",
-      "type": "debugpy",
-      "noDebug": true,
-      "request": "launch",
-      "module": "pybricksdev",
-      "args": [
-        "run",
-        "ble",
-        "--name",
-        "BR-5",
-        "main.py"
-        //"xbox_controller.py"
-      ]
-    },
-    {
       "name": "Run on BR-03",
       "type": "debugpy",
       "noDebug": true,
@@ -146,6 +104,7 @@
         "--name",
         "BR-03",
         "main.py"
+        //"xbox_controller.py"
       ]
     }
   ]

@@ -1,18 +1,4 @@
 {
-    "python.defaultInterpreterPath": ".venv/bin/python",
-    "python.analysis.typeCheckingMode": "basic",
-    "python.analysis.diagnosticMode": "workspace",
-    "python.analysis.autoImportCompletions": true,
-    "terminal.integrated.profiles.osx": {
-        "venv (zsh)": {
-            "path": "zsh",
-            "args": [
-                "-l",
-                "-c",
-                "source .venv/bin/activate && exec zsh -l"
-            ]
-        }
-    },
     "files.eol": "\n",
     "files.insertFinalNewline": true,
     "terminal.integrated.defaultProfile.osx": "venv (zsh)",
@@ -38,5 +24,9 @@
             ]
         }
     },
-    "terminal.integrated.defaultProfile.linux": "venv (bash)"
+    "terminal.integrated.defaultProfile.linux": "venv (bash)",
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.terminal.activateEnvironment": true
+
+
 }

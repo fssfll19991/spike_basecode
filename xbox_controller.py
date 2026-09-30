@@ -58,11 +58,13 @@ DIRECTION_NAMES = {
 
 # Movement recording storage
 movement_log = []
-recording_enabled = True  # Always recording
+recording_enabled = False  # Start with recording disabled
 
 async def main1():
     # This main task will handle driving and the motors that power
     # the left and right attachements.
+    global recording_enabled, movement_log
+
     left.control.limits(acceleration=2500)
     right.control.limits(acceleration=2500)
     print_counter = 0
@@ -75,10 +77,56 @@ async def main1():
         await wait(1)
         pressed = controller.buttons.pressed()
 
-        # Check if Y button is pressed to start playback
-        if Button.Y in pressed and not playback_in_progress:
+        # Check if A button is pressed to reset and start recording
+        if Button.A in pressed and not playback_in_progress:
+            movement_log = []
+            recording_enabled = True
+            print("\n>>> Recording STARTED - Mission log reset <<<")
+            print("Drive your mission using dpad, X, B, RT, LT")
+            print("Press Y when done to save and playback\n")
+            # Reset tracking variables
+            active_direction = 0
+            left_start = left.angle()
+            right_start = right.angle()
+            last_drive_value = None
+            await wait(300)  # Debounce
+            continue
+
+        # Check if Y button is pressed to stop recording and start playback
+        if Button.Y in pressed and not playback_in_progress and recording_enabled:
+            # Record the final movement before stopping
+            if active_direction != 0:
+                left_delta = left.angle() - left_start
+                right_delta = right.angle() - right_start
+                if active_direction in (3, 7):
+                    # Record final turn
+                    wheel_angle = abs(left_delta - right_delta) / 2
+                    angle_turned = wheel_angle * WHEEL_DIAMETER / TRACK_WIDTH
+                    if angle_turned > 0.5:
+                        movement = {
+                            "type": "turn",
+                            "direction": active_direction,
+                            "angle_deg": angle_turned
+                        }
+                        movement_log.append(movement)
+                        print("[RECORDED] Final Turn: {0:.1f} deg".format(angle_turned))
+                elif active_direction in (1, 5):
+                    # Record final drive
+                    average_angle = (left_delta + right_delta) / 2
+                    distance_cm = average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10
+                    if abs(distance_cm) > 0.5:
+                        movement = {
+                            "type": "drive",
+                            "direction": active_direction,
+                            "distance_cm": distance_cm
+                        }
+                        movement_log.append(movement)
+                        print("[RECORDED] Final Drive: {0:.1f} cm".format(distance_cm))
+
+            recording_enabled = False
             playback_in_progress = True
-            print("\n>>> Playback triggered! <<<")
+            print("\n>>> Recording STOPPED - Starting playback <<<")
+            print_movement_summary()
             await playback_movements()
             playback_in_progress = False
             # Reset tracking variables after playback
@@ -98,19 +146,39 @@ async def main1():
         # ahead in the same direction with several short presses still
         # adds up. Only pressing an actual different direction resets it.
         if direction and direction != active_direction:
+            # Before changing direction, record the completed movement
+            if recording_enabled and active_direction != 0:
+                left_delta = left.angle() - left_start
+                right_delta = right.angle() - right_start
+                if active_direction in (3, 7):
+                    # Record completed turn
+                    wheel_angle = abs(left_delta - right_delta) / 2
+                    angle_turned = wheel_angle * WHEEL_DIAMETER / TRACK_WIDTH
+                    if angle_turned > 0.5:  # Only record if significant
+                        movement = {
+                            "type": "turn",
+                            "direction": active_direction,
+                            "angle_deg": angle_turned
+                        }
+                        movement_log.append(movement)
+                        print("[RECORDED] Turn: {0:.1f} deg".format(angle_turned))
+                elif active_direction in (1, 5):
+                    # Record completed drive
+                    average_angle = (left_delta + right_delta) / 2
+                    distance_cm = average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10
+                    if abs(distance_cm) > 0.5:  # Only record if significant
+                        movement = {
+                            "type": "drive",
+                            "direction": active_direction,
+                            "distance_cm": distance_cm
+                        }
+                        movement_log.append(movement)
+                        print("[RECORDED] Drive: {0:.1f} cm".format(distance_cm))
+
             active_direction = direction
             left_start = left.angle()
             right_start = right.angle()
             print("Direction: {0}".format(DIRECTION_NAMES[direction]))
-            # Record the direction change
-            if recording_enabled:
-                movement = {
-                    "type": "drive_start",
-                    "direction": direction,
-                    "direction_name": DIRECTION_NAMES[direction]
-                }
-                movement_log.append(movement)
-                print("[RECORDED] Drive: {0}".format(DIRECTION_NAMES[direction]))
         # Print to the debug screen every 500 ms, measured since the
         # current direction was first selected. For Left/Right (pivot
         # turns), print the angle the robot turned. Otherwise, print
@@ -137,30 +205,12 @@ async def main1():
                     if drive_value != last_drive_value:
                         last_drive_value = drive_value
                         print("Angle turned: {0:.1f} deg".format(drive_value))
-                        # Record the angle turned
-                        if recording_enabled:
-                            movement = {
-                                "type": "turn",
-                                "direction": active_direction,
-                                "angle_deg": drive_value
-                            }
-                            movement_log.append(movement)
-                            print("[RECORDED] Turn angle: {0:.1f} deg".format(drive_value))
                 else:
                     average_angle = (left_delta + right_delta) / 2
                     drive_value = round(average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10, 1)
                     if drive_value != last_drive_value:
                         last_drive_value = drive_value
                         print("Distance driven: {0:.1f} cm".format(drive_value))
-                        # Record the distance driven
-                        if recording_enabled:
-                            movement = {
-                                "type": "drive",
-                                "direction": active_direction,
-                                "distance_cm": drive_value
-                            }
-                            movement_log.append(movement)
-                            print("[RECORDED] Distance: {0:.1f} cm".format(drive_value))
         # Use the direction pad for driving.
         if direction == 1:
             # Forward. Use the drive base so the gyro keeps us
@@ -252,12 +302,12 @@ def print_movement_summary():
     if len(movement_log) > 0:
         print("\nMovements:")
         for i, move in enumerate(movement_log):
-            if move["type"] == "drive_start":
-                print("{0}: START - {1}".format(i+1, move["direction_name"]))
-            elif move["type"] == "drive":
-                print("{0}: DRIVE - {1} cm".format(i+1, move["distance_cm"]))
+            if move["type"] == "drive":
+                direction_name = DIRECTION_NAMES.get(move["direction"], "Unknown")
+                print("{0}: DRIVE {1} - {2:.1f} cm".format(i+1, direction_name, move["distance_cm"]))
             elif move["type"] == "turn":
-                print("{0}: TURN - {1} deg".format(i+1, move["angle_deg"]))
+                direction_name = DIRECTION_NAMES.get(move["direction"], "Unknown")
+                print("{0}: TURN {1} - {2:.1f} deg".format(i+1, direction_name, move["angle_deg"]))
             elif move["type"] == "attachment":
                 print("{0}: {1} - {2} deg ({3:+d})".format(
                     i+1, move["attachment"], move["angle_deg"], move["delta"]))
@@ -281,11 +331,7 @@ async def playback_movements():
     for i, move in enumerate(movement_log):
         print("[PLAYBACK {0}/{1}] ".format(i+1, len(movement_log)), end="")
 
-        if move["type"] == "drive_start":
-            # Starting a new direction - just print it
-            print("Starting: {0}".format(move["direction_name"]))
-
-        elif move["type"] == "drive":
+        if move["type"] == "drive":
             # Drive forward or reverse a certain distance
             distance_cm = move["distance_cm"]
             direction = move["direction"]
