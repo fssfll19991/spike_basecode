@@ -24,8 +24,8 @@ def mission_two(r: robot):
     r.robot.straight(712)
     #motor.run_for_degrees(port.A, -90, 100)
     #r.ram.run_time(-270,5000)
-    r.lam.run_time(-270,100)
-    r.lam.run_time(1000,750)
+    r.lam.run_time(271,700)
+    r.lam.run_time(-100,750)
     r.robot.straight(-100)
 
 
