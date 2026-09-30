@@ -17,18 +17,17 @@ from robot import robot
 from pybricks.tools import wait, StopWatch
 
 def mission_one(r: robot):
-    print("Running Mission 1")
+    print("Running Mission 111111")
     # Your code goes here...
-    # Sample Code: Run attachment motors and drive motors
-    r.robot.straight(700)
-    r.robot.turn(60)
-    r.robot.straight(300)
-    r.robot.straight(-95)
-    r.robot.turn(-140)
-    r.robot.straight(-110)
+    r.robot.straight(230)
+    r.robot.turn(-50)
+    r.robot.straight(400)
+    r.lam.run_time(5000,500)
+    r.robot.straight(-400)
     r.robot.turn(-20)
-    r.robot.straight(-120)
-    r.ram.run_time(-150,7000)
+    r.robot.straight(500)
+    r.lam.run_time(100,5000)
+
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.
