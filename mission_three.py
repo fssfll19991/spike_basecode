@@ -34,7 +34,7 @@ def mission_three(r: robot):
     r.robot.straight(300)
     r.robot.turn(-85)
     r.robot.straight(-150)
-    r.robot.turn(-10)
+    r.robot.turn(-20)
     r.robot.straight(500)
     r.robot.turn(50)
     r.robot.straight(400)
