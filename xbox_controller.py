@@ -71,6 +71,7 @@ async def main1():
     active_direction = 0
     left_start = left.angle()
     right_start = right.angle()
+    gyro_start = drivebase.angle()  # Track gyro heading for turns
     last_drive_value = None
     playback_in_progress = False
     while True:
@@ -88,6 +89,7 @@ async def main1():
             active_direction = 0
             left_start = left.angle()
             right_start = right.angle()
+            gyro_start = drivebase.angle()
             last_drive_value = None
             await wait(300)  # Debounce
             continue
@@ -96,12 +98,14 @@ async def main1():
         if Button.Y in pressed and not playback_in_progress and recording_enabled:
             # Record the final movement before stopping
             if active_direction != 0:
-                left_delta = left.angle() - left_start
-                right_delta = right.angle() - right_start
                 if active_direction in (3, 7):
-                    # Record final turn
-                    wheel_angle = abs(left_delta - right_delta) / 2
-                    angle_turned = wheel_angle * WHEEL_DIAMETER / TRACK_WIDTH
+                    # Record final turn using gyro
+                    gyro_delta = drivebase.angle() - gyro_start
+                    # Normalize to handle gyro wrapping
+                    if active_direction == 3:  # Right turn (should be negative)
+                        angle_turned = abs(gyro_delta)
+                    else:  # Left turn (should be positive)
+                        angle_turned = abs(gyro_delta)
                     if angle_turned > 0.5:
                         movement = {
                             "type": "turn",
@@ -109,9 +113,11 @@ async def main1():
                             "angle_deg": angle_turned
                         }
                         movement_log.append(movement)
-                        print("[RECORDED] Final Turn: {0:.1f} deg".format(angle_turned))
+                        print("[RECORDED] Final Turn: {0:.1f} deg (gyro)".format(angle_turned))
                 elif active_direction in (1, 5):
                     # Record final drive
+                    left_delta = left.angle() - left_start
+                    right_delta = right.angle() - right_start
                     average_angle = (left_delta + right_delta) / 2
                     distance_cm = average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10
                     if abs(distance_cm) > 0.5:
@@ -133,6 +139,7 @@ async def main1():
             active_direction = 0
             left_start = left.angle()
             right_start = right.angle()
+            gyro_start = drivebase.angle()
             last_drive_value = None
             continue
         # Only Forward (1), Right (3), Reverse (5), and Left (7) drive
@@ -148,12 +155,10 @@ async def main1():
         if direction and direction != active_direction:
             # Before changing direction, record the completed movement
             if recording_enabled and active_direction != 0:
-                left_delta = left.angle() - left_start
-                right_delta = right.angle() - right_start
                 if active_direction in (3, 7):
-                    # Record completed turn
-                    wheel_angle = abs(left_delta - right_delta) / 2
-                    angle_turned = wheel_angle * WHEEL_DIAMETER / TRACK_WIDTH
+                    # Record completed turn using gyro
+                    gyro_delta = drivebase.angle() - gyro_start
+                    angle_turned = abs(gyro_delta)
                     if angle_turned > 0.5:  # Only record if significant
                         movement = {
                             "type": "turn",
@@ -161,9 +166,11 @@ async def main1():
                             "angle_deg": angle_turned
                         }
                         movement_log.append(movement)
-                        print("[RECORDED] Turn: {0:.1f} deg".format(angle_turned))
+                        print("[RECORDED] Turn: {0:.1f} deg (gyro)".format(angle_turned))
                 elif active_direction in (1, 5):
                     # Record completed drive
+                    left_delta = left.angle() - left_start
+                    right_delta = right.angle() - right_start
                     average_angle = (left_delta + right_delta) / 2
                     distance_cm = average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10
                     if abs(distance_cm) > 0.5:  # Only record if significant
@@ -178,10 +185,11 @@ async def main1():
             active_direction = direction
             left_start = left.angle()
             right_start = right.angle()
+            gyro_start = drivebase.angle()
             print("Direction: {0}".format(DIRECTION_NAMES[direction]))
         # Print to the debug screen every 500 ms, measured since the
         # current direction was first selected. For Left/Right (pivot
-        # turns), print the angle the robot turned. Otherwise, print
+        # turns), print the angle the robot turned using gyro. Otherwise, print
         # the distance driven.
         print_counter += 1
         if print_counter >= 500:
@@ -192,20 +200,16 @@ async def main1():
             using_other_motor = (Button.RB in pressed or Button.LB in pressed
                                   or Button.X in pressed or Button.B in pressed)
             if not using_other_motor:
-                left_delta = left.angle() - left_start
-                right_delta = right.angle() - right_start
                 if active_direction in (3, 7):
-                    wheel_angle = abs(left_delta - right_delta) / 2
-                    # During a pivot turn, each wheel traces an arc
-                    # around the robot's center, which is
-                    # TRACK_WIDTH / 2 away. Scale the wheel's own
-                    # rotation by the ratio of wheel diameter to track
-                    # width to get the robot's rotation.
-                    drive_value = round(wheel_angle * WHEEL_DIAMETER / TRACK_WIDTH, 1)
+                    # Use gyro for turn angle
+                    gyro_delta = drivebase.angle() - gyro_start
+                    drive_value = round(abs(gyro_delta), 1)
                     if drive_value != last_drive_value:
                         last_drive_value = drive_value
-                        print("Angle turned: {0:.1f} deg".format(drive_value))
+                        print("Angle turned: {0:.1f} deg (gyro)".format(drive_value))
                 else:
+                    left_delta = left.angle() - left_start
+                    right_delta = right.angle() - right_start
                     average_angle = (left_delta + right_delta) / 2
                     drive_value = round(average_angle / 360 * umath.pi * WHEEL_DIAMETER / 10, 1)
                     if drive_value != last_drive_value:
@@ -383,32 +387,28 @@ async def playback_movements():
                 await wait(10)
 
         elif move["type"] == "turn":
-            # Turn left or right a certain angle
+            # Turn left or right a certain angle using gyro
             angle_deg = move["angle_deg"]
             direction = move["direction"]
-            print("Turning {0} deg".format(angle_deg))
+            print("Turning {0} deg (gyro)".format(angle_deg))
 
-            # Convert robot turn angle to wheel angle
-            wheel_angle = angle_deg * TRACK_WIDTH / WHEEL_DIAMETER
-
-            # Reset motor starting positions
-            left_start = left.angle()
-            right_start = right.angle()
+            # Record starting gyro angle
+            gyro_start_playback = drivebase.angle()
 
             # Turn right (3) or left (7)
             if direction == 3:
+                # Right turn - use negative turn rate
                 left.run(50)
                 right.run(-50)
             elif direction == 7:
+                # Left turn - use positive turn rate
                 left.run(-50)
                 right.run(50)
 
-            # Wait until we've turned the target angle
+            # Wait until we've turned the target angle using gyro
             while True:
-                left_delta = left.angle() - left_start
-                right_delta = right.angle() - right_start
-                turned_angle = abs(left_delta - right_delta) / 2
-                if turned_angle >= wheel_angle:
+                gyro_delta = abs(drivebase.angle() - gyro_start_playback)
+                if gyro_delta >= angle_deg:
                     left.stop()
                     right.stop()
                     break
