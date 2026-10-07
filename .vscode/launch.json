@@ -46,7 +46,6 @@
         //"xbox_controller.py"
       ]
     },
-
     {
       "name": "Run on BR-33",
       "type": "debugpy",
@@ -58,8 +57,8 @@
         "ble",
         "--name",
         "BR-33",
-        "main.py"
-        //"xbox_controller.py"
+        //"main.py"
+        "xbox_controller.py"
       ]
     },
     {
