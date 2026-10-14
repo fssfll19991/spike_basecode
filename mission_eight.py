@@ -38,7 +38,9 @@ def mission_eight(r: robot):
 if __name__ == "__main__":
     from main import main
     main()
-
+    
+ # We commented out the entire body here because syntax errors with that comment type
+"""
 /* Complete Mission Sequence:
 --------------------------------------------------
 
@@ -281,3 +283,4 @@ pybricksdev.connections.pybricks.HubDisconnectError: disconnected during operati
 ((.venv) ) ((.venv) ) ^C
 ((.venv) ) ((.venv) )
 */
+"""
