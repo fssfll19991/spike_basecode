@@ -20,12 +20,8 @@ def mission_five(r: robot):
     print("Running Mission 5")
     # Your code goes here...
     r.robot.straight(700)
-    r.robot.turn(-20)
-    r.robot.straight(120)
-    r.robot.turn(-10)
-    r.robot.straight(10)
-    r.robot.straight(-10)
-    r.robot.turn(-10)
+    r.robot.straight(-800)
+
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.
