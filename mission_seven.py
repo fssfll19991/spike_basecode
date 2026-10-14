@@ -21,7 +21,7 @@ def mission_seven(r: robot):
     # Your code goes here...
     # Mission Model 3, Flip the Rock
     r.robot.straight(400)
-    r.lam.run_angle(60,140)
+    r.lam.run_angle(60,120)
     r.robot.straight(-400)
     r.lam.run_angle(-500,45)
 ################################
