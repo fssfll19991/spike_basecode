@@ -40,6 +40,8 @@ if __name__ == "__main__":
     main()
 """
 /* Complete Mission Sequence:
+
+""" /* Complete Mission Sequence:
 --------------------------------------------------
 
 Step 1:
@@ -281,4 +283,3 @@ pybricksdev.connections.pybricks.HubDisconnectError: disconnected during operati
 ((.venv) ) ((.venv) ) ^C
 ((.venv) ) ((.venv) )
 */
-"""
