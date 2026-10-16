@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
  # We commented out the entire body here because syntax errors with that comment type
 """
-/* Complete Mission Sequence:
+#/* Complete Mission Sequence:
 
 """ /* Complete Mission Sequence:
 --------------------------------------------------
