@@ -19,13 +19,36 @@ from pybricks.tools import wait, StopWatch
 def mission_eight(r: robot):
     print("Running Mission 8")
     # Your code goes here...
-    r.robot.drive(450)
+    r.robot.straight(450)
     r.robot.turn(50)
-    r.robot.drive(460)
+    r.robot.straight(460)
     r.robot.turn(-58)
-    r.robot.drive(-20)
+    r.robot.straight(-20)
     r.robot.turn(23)
-    r.robot.drive(-50)
+    #r.robot.straight(-50)
+    r.lam.run_angle(500, 15)
+    # Step 15: TURN Left 23.4 deg -> negative
+    r.robot.turn(-23)
+    # Steps 16-21: Left attachment, concurrent -> sum of deltas (+5-5-5-5-5-5 = -20)
+    r.lam.run_angle(500, -20)
+    # Step 22: straight Forward 13.9 cm -> 139 mm
+    r.robot.straight(139)
+    # Step 23: straight Reverse -61.6 cm -> -616 mm
+    r.robot.straight(-616)
+    # Step 24: TURN Left 13.2 deg -> negative
+    r.robot.turn(-13)
+    # Step 25: TURN Right 87.4 deg -> positive
+    r.robot.turn(87)
+    # Step 26: straight Reverse -50.7 cm -> -507 mm
+    r.robot.straight(-507)
+    # Step 27: straight Forward 4.7 cm -> 47 mm
+    r.robot.straight(47)
+    # Step 28: TURN Left 109.4 deg -> negative
+    r.robot.turn(-109)
+    # Step 29: straight Forward 12.1 cm -> 121 mm
+    r.robot.straight(121)
+    # Step 30: TURN Left 27.4 deg -> negative
+    r.robot.turn(-27)
 
 
 
@@ -47,97 +70,6 @@ if __name__ == "__main__":
 """ /* Complete Mission Sequence:
 --------------------------------------------------
 
-Step 1:
-  Type: DRIVE
-  Direction: Forward
-  Distance: 44.9 cm
-  Raw data: {'distance_cm': 44.9215, 'type': 'drive', 'direction': 1}
-
-Step 2:
-  Type: TURN
-  Direction: Right
-  Angle: 49.9 degrees
-  Raw data: {'angle_deg': 49.90286, 'type': 'turn', 'direction': 3}
-
-Step 3:
-  Type: DRIVE
-  Direction: Forward
-  Distance: 46.6 cm
-  Raw data: {'distance_cm': 46.56822, 'type': 'drive', 'direction': 1}
-
-Step 4:
-  Type: TURN
-  Direction: Left
-  Angle: 55.7 degrees
-  Raw data: {'angle_deg': 55.66064, 'type': 'turn', 'direction': 7}
-
-Step 5:
-  Type: DRIVE
-  Direction: Forward
-  Distance: 2.9 cm
-  Raw data: {'distance_cm': 2.93019, 'type': 'drive', 'direction': 1}
-
-Step 6:
-  Type: DRIVE
-  Direction: Reverse
-  Distance: -4.9 cm
-  Raw data: {'distance_cm': -4.891722, 'type': 'drive', 'direction': 5}
-
-Step 7:
-  Type: TURN
-  Direction: Left
-  Angle: 10.2 degrees
-  Raw data: {'angle_deg': 10.17001, 'type': 'turn', 'direction': 7}
-
-Step 8:
-  Type: TURN
-  Direction: Right
-  Angle: 33.5 degrees
-  Raw data: {'angle_deg': 33.53641, 'type': 'turn', 'direction': 3}
-
-Step 9:
-  Type: DRIVE
-  Direction: Reverse
-  Distance: -6.0 cm
-  Raw data: {'distance_cm': -6.029895, 'type': 'drive', 'direction': 5}
-
-Step 10:
-  Type: DRIVE
-  Direction: Forward
-  Distance: 1.0 cm
-  Raw data: {'distance_cm': 0.9928741, 'type': 'drive', 'direction': 1}
-
-Step 11:
-  Type: ATTACHMENT
-  Motor: Left attachement
-  Target Angle: 126 degrees
-  Delta: +5 degrees
-  Button: Button.RB
-  Raw data: {'angle_deg': 126, 'delta': 5, 'type': 'attachment', 'attachment': 'Left attachement', 'button': 'Button.RB'}
-
-Step 12:
-  Type: ATTACHMENT
-  Motor: Left attachement
-  Target Angle: 131 degrees
-  Delta: +5 degrees
-  Button: Button.RB
-  Raw data: {'angle_deg': 131, 'delta': 5, 'type': 'attachment', 'attachment': 'Left attachement', 'button': 'Button.RB'}
-
-Step 13:
-  Type: ATTACHMENT
-  Motor: Left attachement
-  Target Angle: 136 degrees
-  Delta: +5 degrees
-  Button: Button.RB
-  Raw data: {'angle_deg': 136, 'delta': 5, 'type': 'attachment', 'attachment': 'Left attachement', 'button': 'Button.RB'}
-
-Step 14:
-  Type: ATTACHMENT
-  Motor: Left attachement
-  Target Angle: 141 degrees
-  Delta: +5 degrees
-  Button: Button.RB
-  Raw data: {'angle_deg': 141, 'delta': 5, 'type': 'attachment', 'attachment': 'Left attachement', 'button': 'Button.RB'}
 
 Step 15:
   Type: TURN
@@ -194,16 +126,16 @@ Step 21:
   Raw data: {'angle_deg': 122, 'delta': -5, 'type': 'attachment', 'attachment': 'Left attachement', 'button': 'Button.LB'}
 
 Step 22:
-  Type: DRIVE
+  Type: straight
   Direction: Forward
   Distance: 13.9 cm
-  Raw data: {'distance_cm': 13.85181, 'type': 'drive', 'direction': 1}
+  Raw data: {'distance_cm': 13.85181, 'type': 'straight', 'direction': 1}
 
 Step 23:
-  Type: DRIVE
+  Type: straight
   Direction: Reverse
   Distance: -61.6 cm
-  Raw data: {'distance_cm': -61.5582, 'type': 'drive', 'direction': 5}
+  Raw data: {'distance_cm': -61.5582, 'type': 'straight', 'direction': 5}
 
 Step 24:
   Type: TURN
@@ -218,16 +150,16 @@ Step 25:
   Raw data: {'angle_deg': 87.4129, 'type': 'turn', 'direction': 3}
 
 Step 26:
-  Type: DRIVE
+  Type: straight
   Direction: Reverse
   Distance: -50.7 cm
-  Raw data: {'distance_cm': -50.6608, 'type': 'drive', 'direction': 5}
+  Raw data: {'distance_cm': -50.6608, 'type': 'straight', 'direction': 5}
 
 Step 27:
-  Type: DRIVE
+  Type: straight
   Direction: Forward
   Distance: 4.7 cm
-  Raw data: {'distance_cm': 4.722207, 'type': 'drive', 'direction': 1}
+  Raw data: {'distance_cm': 4.722207, 'type': 'straight', 'direction': 1}
 
 Step 28:
   Type: TURN
@@ -236,10 +168,10 @@ Step 28:
   Raw data: {'angle_deg': 109.4407, 'type': 'turn', 'direction': 7}
 
 Step 29:
-  Type: DRIVE
+  Type: straight
   Direction: Forward
   Distance: 12.1 cm
-  Raw data: {'distance_cm': 12.13244, 'type': 'drive', 'direction': 1}
+  Raw data: {'distance_cm': 12.13244, 'type': 'straight', 'direction': 1}
 
 Step 30:
   Type: TURN
