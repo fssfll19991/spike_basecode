@@ -24,8 +24,6 @@ def mission_two(r: robot):
     r.robot.turn(-50)
     r.robot.straight(375)
     r.robot.straight(-100)
-
-
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.

@@ -40,8 +40,7 @@ def mission_three(r: robot):
     #r.robot.straight(500)
     #r.robot.turn(50)
     #r.robot.straight(400)
-
-
+    
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.

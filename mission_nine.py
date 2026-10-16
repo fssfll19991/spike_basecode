@@ -28,7 +28,6 @@ def mission_nine(r: robot):
     r.robot.turn(-5)
     r.robot.straight(20)
     r.lam.run_angle(-500,90)
-
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.
