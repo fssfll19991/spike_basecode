@@ -18,11 +18,14 @@ from pybricks.tools import wait, StopWatch
 
 def mission_four(r: robot):
     print("Running Mission 4")
-    # Your code goes here...
-    # Sample code: Test the speaker
-    r.robot.straight(-740)
+    r.robot.straight(350)# Your code goes here...
+    r.robot.turn(90)# Sample code: Test the speaker
+    r.robot.straight(750)
     #r.robot.drive(0,10)
-    r.ram.run_time(-270,5000)
+    r.lam.run_angle(-500,60)
+    r.robot.straight(-100)
+    r.robot.straight(-800)
+
     #r.robot.stop()
 ################################
 # KEEP THIS AT THE END OF THE FILE
