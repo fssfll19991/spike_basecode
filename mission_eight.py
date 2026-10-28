@@ -19,20 +19,22 @@ from pybricks.tools import wait, StopWatch
 def mission_eight(r: robot):
     print("Running Mission 8")
     # Your code goes here...
+    # Abigail vine
+
     r.robot.straight(450)
     r.robot.turn(50)
     r.robot.straight(460)
-    r.robot.turn(-58)
-    r.robot.straight(-20)
-    r.robot.turn(23)
+    r.robot.turn(-65)
+    r.robot.straight(110)
+    #r.robot.turn(50)
     #r.robot.straight(-50)
-    r.lam.run_angle(500, 15)
+    r.lam.run_angle(500, -30)
     # Step 15: TURN Left 23.4 deg -> negative
     r.robot.turn(-23)
     # Steps 16-21: Left attachment, concurrent -> sum of deltas (+5-5-5-5-5-5 = -20)
     r.lam.run_angle(500, -20)
     # Step 22: straight Forward 13.9 cm -> 139 mm
-    r.robot.straight(139)
+    r.robot.straight(-139)
     # Step 23: straight Reverse -61.6 cm -> -616 mm
     r.robot.straight(-616)
     # Step 24: TURN Left 13.2 deg -> negative
