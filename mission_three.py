@@ -26,7 +26,7 @@ def mission_three(r: robot):
     r.robot.straight(100)
     r.robot.turn(-90)
     r.lam.run_time(100, 1500)
-    r.robot.turn(-25)
+    r.robot.turn(-27)
     r.lam.run_time(-100, 1500)
     r.robot.turn(-10)
     r.robot.arc(300,90)
@@ -40,7 +40,7 @@ def mission_three(r: robot):
     #r.robot.straight(500)
     #r.robot.turn(50)
     #r.robot.straight(400)
-    
+
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.
