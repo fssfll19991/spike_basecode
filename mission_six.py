@@ -21,7 +21,7 @@ def mission_six(r: robot):
     # Your code goes here...
     r.robot.straight(230)
     r.robot.turn(-40)
-    r.robot.straight(300)
+    r.robot.straight(304)
     r.lam.run_time(-100,1000)
     r.robot.straight(-20)
     r.lam.run_time(-100,1000)
