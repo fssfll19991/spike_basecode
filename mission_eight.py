@@ -35,6 +35,8 @@ def mission_eight(r: robot):
     r.lam.run_angle(500, -20)
     # Step 22: straight Forward 13.9 cm -> 139 mm
     r.robot.straight(-139)
+
+"""
     # Step 23: straight Reverse -61.6 cm -> -616 mm
     r.robot.straight(-616)
     # Step 24: TURN Left 13.2 deg -> negative
@@ -51,6 +53,14 @@ def mission_eight(r: robot):
     r.robot.straight(121)
     # Step 30: TURN Left 27.4 deg -> negative
     r.robot.turn(-27)
+"""
+    r.robot.turn(-90)
+    r.robot.straight(-200)
+    r.robot.straight(-20)
+
+    r.robot.straight(100)
+    r.robot.turn(-45)
+    r.robot.straight(600)
 
 
 
