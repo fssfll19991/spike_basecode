@@ -36,6 +36,21 @@ def mission_eight(r: robot):
     # Step 22: straight Forward 13.9 cm -> 139 mm
     r.robot.straight(-139)
 
+
+## BELOW CODE IS NEW
+
+    r.robot.turn(-45)
+    r.robot.straight(-510)
+    r.robot.turn(-45)
+    r.robot.settings(straight_speed=100)
+    r.robot.straight(-280)
+    r.robot.settings(straight_speed=800)
+
+    r.robot.straight(170)
+    r.robot.turn(85)
+    r.robot.straight(-900)
+
+### ABOVE CODE IS NEW
 """
     # Step 23: straight Reverse -61.6 cm -> -616 mm
     r.robot.straight(-616)
@@ -54,13 +69,7 @@ def mission_eight(r: robot):
     # Step 30: TURN Left 27.4 deg -> negative
     r.robot.turn(-27)
 """
-    r.robot.turn(-90)
-    r.robot.straight(-200)
-    r.robot.straight(-20)
 
-    r.robot.straight(100)
-    r.robot.turn(-45)
-    r.robot.straight(600)
 
 
 
