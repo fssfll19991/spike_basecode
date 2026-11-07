@@ -47,7 +47,8 @@ def mission_eight(r: robot):
     r.robot.settings(straight_speed=800)
 
     r.robot.straight(170)
-    r.robot.turn(85)
+    # ELLA's mission r.robot.turn(85)
+    r.robot.turn(75)
     r.robot.straight(-900)
 
 ### ABOVE CODE IS NEW
