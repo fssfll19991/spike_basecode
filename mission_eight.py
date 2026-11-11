@@ -23,7 +23,7 @@ def mission_eight(r: robot):
 
     r.robot.straight(450)
     r.robot.turn(50)
-    r.robot.straight(460)
+    r.robot.straight(450)
     r.robot.turn(-65)
     r.robot.straight(110)
     #r.robot.turn(50)
@@ -32,23 +32,27 @@ def mission_eight(r: robot):
     # Step 15: TURN Left 23.4 deg -> negative
     r.robot.turn(-23)
     # Steps 16-21: Left attachment, concurrent -> sum of deltas (+5-5-5-5-5-5 = -20)
-    r.lam.run_angle(500, -20)
+    r.lam.run_angle(500, -10)
     # Step 22: straight Forward 13.9 cm -> 139 mm
     r.robot.straight(-139)
 
 
 ## BELOW CODE IS NEW
 
-    r.robot.turn(-45)
-    r.robot.straight(-510)
-    r.robot.turn(-45)
+    r.robot.turn(-90)
+    r.robot.straight(-250)
+    r.robot.turn(45)
+    r.robot.straight(-200)
+    r.robot.turn(45)
+    r.robot.straight(-160)
+    r.robot.turn(-90)
     r.robot.settings(straight_speed=100)
-    r.robot.straight(-280)
+    r.robot.straight(-240)
     r.robot.settings(straight_speed=800)
 
     r.robot.straight(170)
     # ELLA's mission r.robot.turn(85)
-    r.robot.turn(75)
+    r.robot.turn(82)
     r.robot.straight(-900)
 
 ### ABOVE CODE IS NEW

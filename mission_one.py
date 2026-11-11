@@ -19,16 +19,21 @@ from pybricks.tools import wait, StopWatch
 def mission_one(r: robot):
     print("Running Mission 111111")
     # Your code goes here...
+    r.robot.settings(800,1000,500,400)
+
     r.robot.straight(300)
     r.lam.run_time(5000,500)
     r.robot.straight(-300)
     r.lam.run_time(3000,300)
-    r.robot.curve(290,125)
+    r.robot.curve(290,115)
     r.robot.turn(20)
+    r.robot.straight(40)
     r.lam.run_time(-300,800)
     r.robot.straight(-100)
-    r.robot.turn(-90)
-    r.robot.straight(-600)
+    r.robot.turn(-100)
+    r.robot.straight(-700)
+    r.robot.settings(400,300,300,200)
+
     #this part of the mission is the seed :)
     #r.robot.turn(-30)
     #r.robot.straight(400)

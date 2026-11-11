@@ -20,10 +20,12 @@ def mission_two(r: robot):
     print("Running Mission 2")
     # Your code goes here...
     # Sample code: Test Driving in a box
-    r.robot.straight(210)
-    r.robot.turn(-50)
-    r.robot.straight(375)
-    r.robot.straight(-100)
+    r.robot.settings(800,1000,500,400)
+    r.robot.straight(2000)
+    r.robot.settings(400,300,300,200)
+   # r.robot.turn(-50)
+    #r.robot.straight(375)
+   # r.robot.straight(-100)
 ################################
 # KEEP THIS AT THE END OF THE FILE
 # This redirects to running main.
