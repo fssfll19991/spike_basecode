@@ -20,6 +20,7 @@ def mission_eight(r: robot):
     print("Running Mission 8")
     # Your code goes here...
     # Abigail vine
+    r.robot.settings(800,1000,500,400)
 
     r.robot.straight(450)
     r.robot.turn(50)
@@ -47,13 +48,19 @@ def mission_eight(r: robot):
     r.robot.straight(-160)
     r.robot.turn(-90)
     r.robot.settings(straight_speed=100)
+    r.robot.settings(100,100,300,200)
+
     r.robot.straight(-240)
     r.robot.settings(straight_speed=800)
+    r.robot.settings(800,1000,500,400)
+
 
     r.robot.straight(170)
     # ELLA's mission r.robot.turn(85)
     r.robot.turn(82)
     r.robot.straight(-900)
+    r.robot.settings(400,300,300,200)
+
 
 ### ABOVE CODE IS NEW
 """
