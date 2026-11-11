@@ -4,7 +4,7 @@
 # Description:
 # [Describe What your mission does here]
 #
-# Author(s): [Your Name(s)]
+# Author(s): Ella
 # Date: [YYYY-MM-DD]
 # Version: 1.0
 #
@@ -15,11 +15,12 @@
 ################################################################################
 from robot import robot
 from pybricks.tools import wait, StopWatch
+import helpers
 
 def mission_one(r: robot):
-    print("Running Mission 111111")
+    print("Running Mission 1")
     # Your code goes here...
-    r.robot.settings(800,1000,500,400)
+    helpers.turbo_mode(r)
 
     r.robot.straight(300)
     r.lam.run_time(5000,500)
@@ -32,7 +33,8 @@ def mission_one(r: robot):
     r.robot.straight(-100)
     r.robot.turn(-100)
     r.robot.straight(-700)
-    r.robot.settings(400,300,300,200)
+
+    helpers.regular_mode(r)
 
     #this part of the mission is the seed :)
     #r.robot.turn(-30)

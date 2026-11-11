@@ -2,9 +2,8 @@
 # mission_four.py
 #
 # Description:
-# [Describe What your mission does here]
-#
-# Author(s): [Your Name(s)]
+# Solves the fungus
+# Author(s): Lincoln
 # Date: [YYYY-MM-DD]
 # Version: 1.0
 #
@@ -15,11 +14,17 @@
 ################################################################################
 from robot import robot
 from pybricks.tools import wait, StopWatch
+import helpers
 
 def mission_four(r: robot):
     print("Running Mission 4")
+
+    helpers.turbo_mode(r)
+
     r.robot.straight(925)
     r.lam.run_angle(500,90)
+
+    helpers.regular_mode(r)
 
 
 #r.robot.turn(90)

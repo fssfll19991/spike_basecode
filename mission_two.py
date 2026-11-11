@@ -2,7 +2,7 @@
 # mission_two.py
 #
 # Description:
-# [Describe What your mission does here]
+# Drive across
 #
 # Author(s): [Your Name(s)]
 # Date: [YYYY-MM-DD]
@@ -15,14 +15,15 @@
 ################################################################################
 from robot import robot
 from pybricks.tools import wait, StopWatch
+import helpers
 
 def mission_two(r: robot):
     print("Running Mission 2")
     # Your code goes here...
     # Sample code: Test Driving in a box
-    r.robot.settings(800,1000,500,400)
+    helpers.turbo_mode(r)
     r.robot.straight(2000)
-    r.robot.settings(400,300,300,200)
+    helpers.regular_mode(r)
    # r.robot.turn(-50)
     #r.robot.straight(375)
    # r.robot.straight(-100)

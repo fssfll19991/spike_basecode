@@ -2,9 +2,9 @@
 # mission_three.py
 #
 # Description:
-# [Describe What your mission does here]
+# Solves biocentric architecture
 #
-# Author(s): [Your Name(s)]
+# Author(s): Olivia
 # Date: [YYYY-MM-DD]
 # Version: 1.0
 #
@@ -16,11 +16,13 @@
 
 from robot import robot
 from pybricks.tools import wait, StopWatch
+import helpers
 
 def mission_three(r: robot):
     print("Running Mission 3")
-    # Your code goes here...
-    # Sample Code: Test running the attachment motor until stalled
+
+    helpers.turbo_mode(r)
+
     r.robot.straight(1065)
     r.robot.turn(-90)
     r.robot.straight(100)
@@ -40,6 +42,8 @@ def mission_three(r: robot):
     #r.robot.straight(500)
     #r.robot.turn(50)
     #r.robot.straight(400)
+
+    helpers.regular_mode(r)
 
 ################################
 # KEEP THIS AT THE END OF THE FILE

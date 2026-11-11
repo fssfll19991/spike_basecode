@@ -2,9 +2,9 @@
 # mission_six.py
 #
 # Description:
-# [Describe What your mission does here]
+# Solves exploding seeds
 #
-# Author(s): [Your Name(s)]
+# Author(s): Cleo
 # Date: [YYYY-MM-DD]
 # Version: 1.0
 #
@@ -15,20 +15,23 @@
 ################################################################################
 from robot import robot
 from pybricks.tools import wait, StopWatch
+import helpers
 
 def mission_six(r: robot):
     print("Running Mission 6")
     # Your code goes here...
+
+    helpers.turbo_mode(r)
+
     #r.robot.straight(230)
     #r.robot.turn(-40)
-    r.robot.settings(800,1000,500,400)
     r.robot.straight(360)
     r.lam.run_time(-55,1000)
     r.robot.straight(-20)
     r.lam.run_time(-100,1000)
     r.robot.straight(-700)
-    r.robot.settings(400,300,300,200)
 
+    helpers.regular_mode(r)
 
 ################################
 # KEEP THIS AT THE END OF THE FILE
