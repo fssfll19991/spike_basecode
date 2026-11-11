@@ -50,7 +50,7 @@ def mission_eight(r: robot):
     r.robot.settings(straight_speed=100)
     r.robot.settings(100,100,300,200)
 
-    r.robot.straight(-240)
+    r.robot.straight(-230)
     r.robot.settings(straight_speed=800)
     r.robot.settings(800,1000,500,400)
 
